@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Verify the Code is Cloned
-        run: l -la
+        run: ls -la
 
       - name: Copy the Code to the Server
         uses: easingthemes/ssh-deploy@main
