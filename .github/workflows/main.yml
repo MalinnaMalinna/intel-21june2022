@@ -16,8 +16,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Clone the code
+        uses: actions/checkout@v3
+
       - name: Build Step
         run: echo "Build Step"
+      
+      - name: Inject Version Details to the Application
+        run: sed -i 's/REPLACEAPPLICATIONENVIRONMENT/$GITHUB_ENV/g' myapp/version.html
 
   test:
     runs-on: ubuntu-latest
@@ -41,28 +47,30 @@ jobs:
       - name: Verify the Code is Cloned
         run: ls -la
 
-      - name: Copy the Code to the Server
-        uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          ARGS: "-rltgoDzvO"
-          SOURCE: "myapp"
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: ${{ secrets.REMOTE_TARGET }}
+      # - name: Copy the Code to the Server
+      #   uses: easingthemes/ssh-deploy@main
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+      #     ARGS: "-rltgoDzvO"
+      #     SOURCE: "myapp"
+      #     REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+      #     REMOTE_USER: ${{ secrets.REMOTE_USER }}
+      #     TARGET: ${{ secrets.REMOTE_TARGET }}
 
-      - name: Move the file from Home Directory to Apache Die on Remote Ubuntu Server
-        uses: appleboy/ssh-action@master
-        #with:
-           #host: ${{ secrets.REMOTE_HOST }}
-           #username: ${{ secrets.REMOTE_USER}}
-           #key: ${{ secrets.SERVER_SSH_KEY}}
-           #port: ${{ secrets.PORT }}
-           #script: sudo mv myapp/* /var/www/html/
+      # - name: Move the file from Home Directory to Apache Die on Remote Ubuntu Server
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #      host: ${{ secrets.REMOTE_HOST }}
+      #      username: ${{ secrets.REMOTE_USER}}
+      #      key: ${{ secrets.SERVER_SSH_KEY}}
+      #      port: ${{ secrets.PORT }}
+      #      script: sudo mv myapp/* /var/www/html/
 
+      - name: Copy the Index.html to Ubuntu server
+        uses: marcodallasanta/ssh-scp-deployv1.2.0
         with:
-           local: './'                                                  # Local file path - REQUIRED false - DEFAULT ./
-           remote: '~/'                                                 # Remote file path - REQUIRED false - DEFAULT ~/
+           local: 'myapp'                                                  # Local file path - REQUIRED false - DEFAULT ./
+           remote: '/home/azureuser'                                                 # Remote file path - REQUIRED false - DEFAULT ~/
            host: ${{secrets.REMOTE_HOST}}                                      # Remote server address - REQUIRED true
            port: ${{secrets.PORT}}                                      # Remote server port - REQUIRED false - DEFAULT 22
            user: ${{secrets.REMOTE_USER}}                                      # Remote server user - REQUIRED true
@@ -70,7 +78,7 @@ jobs:
            key: ${{secrets.SERVER_SSH_KEY}}                                      # Remote server private key - REQUIRED at least one of "password" or "key" 
            ARGS: "-rltgoDzvO"
            SOURCE: "myapp"
-           pre_upload: echo "This will be executed before the upload!"  # Command to run via ssh before scp upload - REQUIRED false
-           post_upload: echo "This will be executed after the upload!"  # Command to run via ssh after scp upload - REQUIRED false
+           pre_upload: echo "remove the files"  # Command to run via ssh before scp upload - REQUIRED false
+           post_upload: sudo mv myapp/* /var/www/html/ # Command to run via ssh after scp upload - REQUIRED false
            ssh_options: -o StrictHostKeyChecking=no                     # A set of ssh_option separated by -o - REQUIRED false - DEFAULT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
            scp_options: -v  
