@@ -67,7 +67,7 @@ jobs:
       #      script: sudo mv myapp/* /var/www/html/
 
       - name: Copy the Index.html to Ubuntu server
-        uses: marcodallasanta/ssh-scp-deployv1.2.0
+        uses: marcodallasanta/ssh-scp-deploy@v1.2.0
         with:
            local: 'myapp'                                                  # Local file path - REQUIRED false - DEFAULT ./
            remote: '/home/azureuser'                                                 # Remote file path - REQUIRED false - DEFAULT ~/
