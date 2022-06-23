@@ -23,7 +23,7 @@ jobs:
         run: echo "Build Step"
       
       - name: Inject Version Details to the Application
-        run: sed -i 's/REPLACEAPPLICATIONENVIRONMENT/$GITHUB_ENV/g' myapp/version.html
+        run: sed -i 's/REPLACEAPPLICATIONENVIRONMENT/$GITHUB_ENV/g' /var/www/html/myapp/version.html
 
   test:
     runs-on: ubuntu-latest
