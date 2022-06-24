@@ -23,7 +23,8 @@ jobs:
         run: echo "Build Step"
       
       - name: Inject Version Details to the Application
-        run: sed -i 's/REPLACEAPPLICATIONENVIRONMENT/$GITHUB_ENV/g' myapp/version.html
+        run: sed -i 's/REPLACEAPPLICATIONENVIRONMENT/\$GITHUB_ENV/g' myapp/version.html
+        run: sed -i 's/REPLACEAPPBUILDNO/\$GITHUB_RUN_NUMBER/g' myapp/version.html        
 
       - name: Upload the Artifact
         uses: actions/upload-artifact@v3
@@ -39,13 +40,15 @@ jobs:
         run: echo "Test Step"
 
       - name: Download the Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/download-artifact@v3
         with:
           name: myapp-package
           path: myapp
  
       - name: Verify the downloaded Packages
-        run: ls -la
+        run: |
+        ls -la
+        pwd
 
       - name: Cat the file and test for replacement
         run: cat myapp/version.html
@@ -61,8 +64,13 @@ jobs:
 
    
     steps:
-      - name: Clone the code
-        uses: actions/checkout@v3
+      # - name: Clone the code
+      #   uses: actions/checkout@v3
+      - name: Download the myapp-package
+        uses: actions/download-artifact@v3
+        with:
+          name: myapp-package
+          path: myapp
 
       - name: Verify the Code is Cloned
         run: ls -la
