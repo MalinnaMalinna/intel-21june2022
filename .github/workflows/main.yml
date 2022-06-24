@@ -23,7 +23,13 @@ jobs:
         run: echo "Build Step"
       
       - name: Inject Version Details to the Application
-        run: sed -i 's/REPLACEAPPLICATIONENVIRONMENT/$GITHUB_ENV/g' /var/www/html/myapp/version.html
+        run: sed -i 's/REPLACEAPPLICATIONENVIRONMENT/$GITHUB_ENV/g' myapp/version.html
+
+      - name: Upload the Artifact
+        uses: action/upload-artifact@v3
+        with:
+          name: myapp-package
+          part: myapp
 
   test:
     runs-on: ubuntu-latest
@@ -32,9 +38,24 @@ jobs:
       - name: Test Step
         run: echo "Test Step"
 
+      - name: Download the Artifact
+        uses: action/upload-artifact@v3
+        with:
+          name: myapp-package
+          path: myapp
+ 
+      - name: Verify the downloaded Packages
+        run: ls -la
+             pwd
+
+      - name: Cat the file and test for replacement
+        run: cat myapp/version.html
+
   deployment:
  
     runs-on: ubuntu-latest
+    needs: test
+    timeout-minutes: 10
     environment:
       name: development
       url: http://20.106.192.145/contact.html
