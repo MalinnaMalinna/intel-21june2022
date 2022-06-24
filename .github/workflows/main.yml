@@ -46,7 +46,6 @@ jobs:
  
       - name: Verify the downloaded Packages
         run: ls -la
-             pwd
 
       - name: Cat the file and test for replacement
         run: cat myapp/version.html
