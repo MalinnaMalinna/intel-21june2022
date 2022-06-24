@@ -23,8 +23,9 @@ jobs:
         run: echo "Build Step"
       
       - name: Inject Version Details to the Application
-        run: sed -i 's/REPLACEAPPLICATIONENVIRONMENT/\$GITHUB_ENV/g' myapp/version.html
-        run: sed -i 's/REPLACEAPPBUILDNO/\$GITHUB_RUN_NUMBER/g' myapp/version.html        
+        run: |
+        sed -i 's/REPLACEAPPLICATIONENVIRONMENT/\$GITHUB_ENV/g' myapp/version.html
+        sed -i 's/REPLACEAPPBUILDNO/\$GITHUB_RUN_NUMBER/g' myapp/version.html        
 
       - name: Upload the Artifact
         uses: actions/upload-artifact@v3
@@ -34,7 +35,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-
+    needs: build
     steps:
       - name: Test Step
         run: echo "Test Step"
@@ -47,14 +48,13 @@ jobs:
  
       - name: Verify the downloaded Packages
         run: |
-        ls -la
-        pwd
+          ls -la
+          pwd
 
       - name: Cat the file and test for replacement
         run: cat myapp/version.html
 
   deployment:
- 
     runs-on: ubuntu-latest
     needs: test
     timeout-minutes: 10
@@ -108,5 +108,5 @@ jobs:
            SOURCE: "myapp"
            pre_upload: echo "remove the files"  # Command to run via ssh before scp upload - REQUIRED false
            post_upload: sudo mv myapp/* /var/www/html/ # Command to run via ssh after scp upload - REQUIRED false
-           ssh_options: -o StrictHostKeyChecking=no                     # A set of ssh_option separated by -o - REQUIRED false - DEFAULT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
-           scp_options: -v  
+          #  ssh_options: -o StrictHostKeyChecking=no                     # A set of ssh_option separated by -o - REQUIRED false - DEFAULT -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+          #  scp_options: -v  
